@@ -21,6 +21,7 @@ public class Donor {
     }
 
     public void setDonorId(int donorId) {
+
         this.donorId = donorId;
     }
 
@@ -40,6 +41,7 @@ public class Donor {
     }
 
     public void setEmail(String email) {
+
         this.email = email;
     }
 
@@ -54,6 +56,7 @@ public class Donor {
     }
 
     public String getDonorType() {
+
         return donorType;
     }
 
@@ -63,6 +66,7 @@ public class Donor {
     }
 
     public boolean equals(Donor other) {
+
         return other != null && this.donorId == other.donorId;
     }
 
