@@ -4,7 +4,6 @@ public class Charity {
     private String name;
     private String category;
     private String email;
-    private boolean active;
 
     public Charity(int charityId, String name, String category, String email) {
         this.charityId = charityId;
@@ -45,9 +44,6 @@ public class Charity {
         this.email = email;
     }
 
-    public boolean isActive() {
-        return active;
-    }
 
     public String toString() {
         return "Charity{id=" + charityId +

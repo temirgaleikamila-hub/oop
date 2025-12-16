@@ -13,25 +13,29 @@ public class Donation {
                     String paymentMethod, String status) {
         this.donationId = donationId;
         this.donor = donor;
-        this.charity = charity;
+        this.charity=charity;
         this.amount = amount;
         this.donatedAt = donatedAt;
         this.paymentMethod = paymentMethod;
         this.status = status;
     }
     public int getDonationId() {
+
         return donationId;
     }
 
     public void setDonationId(int donationId) {
+
         this.donationId = donationId;
     }
 
     public double getAmount() {
+
         return amount;
     }
 
     public void setAmount(double amount) {
+
         this.amount = amount;
     }
 
@@ -40,7 +44,7 @@ public class Donation {
                 ", donor=" + donor.getFullName() +
                 ", charity=" + charity.getName() +
                 ", amount=" + amount +
-                ", date='" + donatedAt + '\'' +
+                ", date='" + donatedAt +
                 ", method='" + paymentMethod +
                 ", status='" + status + "'}";
     }

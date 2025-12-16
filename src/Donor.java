@@ -16,6 +16,7 @@ public class Donor {
 
     //using getter and setter
     public int getDonorId() {
+
         return donorId;
     }
 
@@ -24,14 +25,17 @@ public class Donor {
     }
 
     public String getFullName() {
+
         return fullName;
     }
 
     public void setFullName(String fullName) {
+
         this.fullName = fullName;
     }
 
     public String getEmail() {
+
         return email;
     }
 
@@ -40,10 +44,12 @@ public class Donor {
     }
 
     public String getPhone() {
+
         return phone;
     }
 
     public void setPhone(String phone) {
+
         this.phone = phone;
     }
 
@@ -52,6 +58,7 @@ public class Donor {
     }
 
     public void setDonorType(String donorType) {
+
         this.donorType = donorType;
     }
 
