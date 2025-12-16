@@ -12,5 +12,6 @@ public class Main {
         System.out.println(donor1);
         System.out.println(donor2);
         System.out.println("donor 1 equals donor 2? " + donor1.equals(donor2));
+        System.out.println("donation and donor");
     }
 }
