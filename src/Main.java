@@ -9,7 +9,6 @@ public class Main {
         Donation donation1 = new Donation(11, donor1, charity1,15000, "2025-12-15", "Card", "paid");
         Donation donation2 = new Donation(12, donor2, charity2, 50000, "2025-12-15", "Kaspi", "paid");
 
-
         System.out.println(charity1);
         System.out.println(charity2);
         System.out.println("charity 1 equals charity 2? " + charity1.equals(charity2));
