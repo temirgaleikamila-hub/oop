@@ -1,6 +1,6 @@
 public class Donation {
 
-    private int donationId;
+    private int donationId; //hidden data (access only with methods)
     private Donor donor;
     private Charity charity;
     private double amount;
@@ -20,22 +20,18 @@ public class Donation {
         this.status = status;
     }
     public int getDonationId() {
-
         return donationId;
     }
 
     public void setDonationId(int donationId) {
-
         this.donationId = donationId;
     }
 
     public double getAmount() {
-
         return amount;
     }
 
     public void setAmount(double amount) {
-
         this.amount = amount;
     }
 

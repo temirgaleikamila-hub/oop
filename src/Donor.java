@@ -16,57 +16,46 @@ public class Donor {
 
     //using getter and setter
     public int getDonorId() {
-
         return donorId;
     }
 
     public void setDonorId(int donorId) {
-
         this.donorId = donorId;
     }
 
     public String getFullName() {
-
         return fullName;
     }
 
     public void setFullName(String fullName) {
-
         this.fullName = fullName;
     }
 
     public String getEmail() {
-
         return email;
     }
 
     public void setEmail(String email) {
-
         this.email = email;
     }
 
     public String getPhone() {
-
         return phone;
     }
 
     public void setPhone(String phone) {
-
         this.phone = phone;
     }
 
     public String getDonorType() {
-
         return donorType;
     }
 
     public void setDonorType(String donorType) {
-
         this.donorType = donorType;
     }
 
     public boolean equals(Donor other) {
-
         return other != null && this.donorId == other.donorId;
     }
 

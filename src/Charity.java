@@ -1,5 +1,5 @@
 public class Charity {
-
+    
     private int charityId;
     private String name;
     private String category;
@@ -13,27 +13,22 @@ public class Charity {
     }
 
     public int getCharityId() {
-
         return charityId;
     }
 
     public void setCharityId(int charityId) {
-
         this.charityId = charityId;
     }
 
     public String getName() {
-
         return name;
     }
 
     public void setName(String name) {
-
         this.name = name;
     }
 
     public String getCategory() {
-
         return category;
     }
 
@@ -42,15 +37,12 @@ public class Charity {
     }
 
     public String getEmail() {
-
         return email;
     }
 
     public void setEmail(String email) {
-
         this.email = email;
     }
-
 
     public String toString() {
         return "Charity{id=" + charityId +
