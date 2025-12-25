@@ -52,6 +52,6 @@ public class Main {
         String email = sc.nextLine();
         System.out.print("Phone: ");
         String phone = sc.nextLine();
-
+    }
 }
 
