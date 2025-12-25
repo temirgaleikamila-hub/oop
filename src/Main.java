@@ -40,5 +40,18 @@ public class Main {
         System.out.println("0) Exit");
         System.out.print("Choose: ");
     }
+
+    private static void addDonor() {
+        System.out.print("Donor type (1=Individual, 2=Corporate): ");
+        String t = sc.nextLine().trim();
+
+        int id = readInt("ID (int): ");
+        System.out.print("Full name: ");
+        String name = sc.nextLine();
+        System.out.print("Email: ");
+        String email = sc.nextLine();
+        System.out.print("Phone: ");
+        String phone = sc.nextLine();
+
 }
 
