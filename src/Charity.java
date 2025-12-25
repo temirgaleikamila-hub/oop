@@ -12,10 +12,6 @@ public class Charity {
         this.email = email;
     }
 
-    public int getCharityId() {
-        return charityId;
-    }
-
     public void setCharityId(int charityId) {
         this.charityId = charityId;
     }
@@ -55,3 +51,4 @@ public class Charity {
         return other != null && this.charityId == other.charityId;
     }
 }
+

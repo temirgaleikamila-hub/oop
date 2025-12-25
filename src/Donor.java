@@ -1,11 +1,12 @@
 public class Donor {
-
+//данные скрыты внутри класса
     private int donorId;
     private String fullName;
     private String email;
     private String phone;
     private String donorType;
 
+    //конструктор класса донор
     public Donor(int donorId, String fullName, String email, String phone, String donorType) {
         this.donorId = donorId;
         this.fullName = fullName;
@@ -13,6 +14,7 @@ public class Donor {
         this.phone = phone;
         this.donorType = donorType;
     }
+    //ссылка на текущий контекст объекта который мы создаем
 
     //using getter and setter
     public int getDonorId() {
@@ -51,19 +53,18 @@ public class Donor {
         return donorType;
     }
 
-    public void setDonorType(String donorType) {
-        this.donorType = donorType;
-    }
-
-    public boolean equals(Donor other) {
-        return other != null && this.donorId == other.donorId;
+  public void setDonorType(String donorType){
+        this.donorType=donorType;
+  }
+    public boolean equals(Donor other){
+        return other != null && this.donorId==other.donorId;
     }
 
     public String toString() {
         return "Donor{id=" + donorId +
-                ", name='" + fullName + '\'' +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
+                ", name='" + fullName +
+                ", email='" + email +
+                ", phone='" + phone +
                 ", type='" + donorType + "'}";
     }
 }

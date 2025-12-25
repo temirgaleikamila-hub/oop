@@ -1,26 +1,44 @@
+import java.util.Scanner;
+
 public class Main {
+    private static final Scanner sc = new Scanner(System.in);
+
     public static void main(String[] args) {
-        Charity charity1 = new Charity(1, "Hope Foundation", "Health", "hope@mail.com");
-        Charity charity2 = new Charity(2, "Bright Future", "Education", "bright@mail.com");
+        while (true) {
+            printMenu();
+            String choice = sc.nextLine().trim();
+            try {
+                if (choice.equals("1")) addDonor();
+                else if (choice.equals("2")) addCharity();
+                else if (choice.equals("3")) addDonation();
+                else if (choice.equals("4")) pool.printAll();
+                else if (choice.equals("5")) searchCharity();
+                else if (choice.equals("6")) filterDonations();
+                else if (choice.equals("7")) sortDonations();
+                else if (choice.equals("0")) {
+                    System.out.println("Bye!");
+                    return;
+                } else {
+                    System.out.println("Unknown choice.");
+                }
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+            System.out.println();
+        }
+    }
 
-        Donor donor1 = new Donor(101010, "Kamila", "k@mail.com", "+77011234567", "Individual");
-        Donor donor2 = new Donor(202020, "Aigul", "a@mail.com", "+77021234567", "Corporate");
-
-        Donation donation1 = new Donation(11, donor1, charity1,15000, "2025-12-15", "Card", "paid");
-        Donation donation2 = new Donation(12, donor2, charity2, 50000, "2025-12-15", "Kaspi", "paid");
-
-        System.out.println(charity1);
-        System.out.println(charity2);
-        System.out.println("charity 1 equals charity 2? " + charity1.equals(charity2));
-
-        System.out.println(donor1);
-        System.out.println(donor2);
-        System.out.println("donor 1 equals donor 2? " + donor1.equals(donor2));
-        System.out.println("donation and donor");
-
-        System.out.println(donation1);
-        System.out.println(donation2);
-        System.out.println("donation 1 equals donation 2? " + donation1.equals(donation2));
-
+    private static void printMenu() {
+        System.out.println("=== Donation System ===");
+        System.out.println("1) Add donor");
+        System.out.println("2) Add charity");
+        System.out.println("3) Add donation");
+        System.out.println("4) List all");
+        System.out.println("5) Search charity");
+        System.out.println("6) Filter donations");
+        System.out.println("7) Sort donations");
+        System.out.println("0) Exit");
+        System.out.print("Choose: ");
     }
 }
+
