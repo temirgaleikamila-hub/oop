@@ -25,8 +25,7 @@ public class Main {
                 } else {
                     System.out.println("Unknown choice.");
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
             System.out.println();
@@ -47,16 +46,39 @@ public class Main {
     }
 
     private static void addDonor() {
-        System.out.print("Donor type (1=Individual, 2=Corporate): ");
-        String t = sc.nextLine().trim();
+        System.out.print("ID (int): ");
+        int id = readInt();
 
-        int id = readInt("ID (int): ");
         System.out.print("Full name: ");
         String name = sc.nextLine();
+
         System.out.print("Email: ");
         String email = sc.nextLine();
+
         System.out.print("Phone: ");
         String phone = sc.nextLine();
+        System.out.print("Donor type (Individual/Corporate): ");
+        String type = sc.nextLine();
+
+        donors.add(new Donor(id, name, email, phone, type));
+        System.out.println("Donor added.");
     }
+    private static void addCharity() {
+        System.out.print("ID (int): ");
+        int id = readInt();
+
+        System.out.print("Name: ");
+        String name = sc.nextLine();
+
+        System.out.print("Category: ");
+        String category = sc.nextLine();
+
+        System.out.print("Email: ");
+        String email = sc.nextLine();
+
+        charities.add(new Charity(id, name, category, email));
+        System.out.println("Charity added.");
+    }
+
 }
 
