@@ -1,7 +1,11 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Main {
     private static final Scanner sc = new Scanner(System.in);
+    private static final ArrayList<Donor> donors = new ArrayList<>();
+    private static final ArrayList<Charity> charities = new ArrayList<>();
+    private static final ArrayList<Donation> donations = new ArrayList<>();
 
     public static void main(String[] args) {
         while (true) {
@@ -11,7 +15,7 @@ public class Main {
                 if (choice.equals("1")) addDonor();
                 else if (choice.equals("2")) addCharity();
                 else if (choice.equals("3")) addDonation();
-                else if (choice.equals("4")) pool.printAll();
+                else if (choice.equals("4")) printAll();
                 else if (choice.equals("5")) searchCharity();
                 else if (choice.equals("6")) filterDonations();
                 else if (choice.equals("7")) sortDonations();
@@ -21,7 +25,8 @@ public class Main {
                 } else {
                     System.out.println("Unknown choice.");
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
             System.out.println();
