@@ -34,19 +34,24 @@ public class Donation {
     public void setAmount(double amount) {
         this.amount = amount;
     }
-
     public String toString() {
         return "Donation{id=" + donationId +
                 ", donor=" + donor.getFullName() +
                 ", charity=" + charity.getName() +
-                ", amount=" + amount +
-                ", date='" + donatedAt +
-                ", method='" + paymentMethod +
-                ", status='" + status + "'}";
+                ", amount=" + amount + "}";
     }
 
-    public boolean equals(Donation other) {
-        return other != null && this.donationId == other.donationId;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Donation)) return false;
+        Donation d = (Donation) o;
+        return donationId == d.donationId;
+    }
+
+    @Override
+    public int hashCode() {
+        return donationId;
     }
 }
 

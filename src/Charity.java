@@ -43,12 +43,13 @@ public class Charity {
     public String toString() {
         return "Charity{id=" + charityId + ", name='" + name + "'}";
     }
+
     @Override
     public int hashCode() {
         return charityId;
     }
+
     public boolean equals(Charity other) {
         return other != null && this.charityId == other.charityId;
     }
 }
-
