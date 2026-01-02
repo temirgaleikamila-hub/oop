@@ -79,6 +79,81 @@ public class Main {
         charities.add(new Charity(id, name, category, email));
         System.out.println("Charity added.");
     }
+    private static void addDonation() {
+        System.out.print("Donation ID (int): ");
+        int donationId = readInt();
+
+        System.out.print("Donor ID (int): ");
+        int donorId = readInt();
+
+        System.out.print("Charity ID (int): ");
+        int charityId = readInt();
+
+        Donor donor = findDonorById(donorId);
+        Charity charity = findCharityById(charityId);
+
+        if (donor == null) {
+            System.out.println("Donor not found.");
+            return;
+        }
+        if (charity == null) {
+            System.out.println("Charity not found.");
+            return;
+        }
+        System.out.print("Amount: ");
+        double amount = readDouble();
+
+        System.out.print("Date (e.g., 2026-01-02): ");
+        String date = sc.nextLine();
+
+        System.out.print("Payment method: ");
+        String method = sc.nextLine();
+
+        System.out.print("Status: ");
+        String status = sc.nextLine();
+
+        donations.add(new Donation(donationId, donor, charity, amount, date, method, status));
+        System.out.println("Donation added.");
+    }
+    private static void printAll() {
+        System.out.println("--- Donors ---");
+        for (Donor d : donors) System.out.println(d);
+
+        System.out.println("--- Charities ---");
+        for (Charity c : charities) System.out.println(c);
+
+        System.out.println("--- Donations ---");
+        for (Donation dn : donations) System.out.println(dn);
+    }
+    //search charity by name
+    private static void searchCharity() {
+        System.out.print("Enter charity name: ");
+        String name = sc.nextLine().trim();
+
+        boolean found = false;
+        for (Charity c : charities) {
+            if (c.getName().equalsIgnoreCase(name)) {
+                System.out.println(c);
+                found = true;
+            }
+        }
+        if (!found) System.out.println("Not found.");
+    }
+
+    // фильтрация пожертвований по минимальной сумме
+    private static void filterDonations() {
+        System.out.print("Min amount: ");
+        double min = readDouble();
+
+        boolean found = false;
+        for (Donation d : donations) {
+            if (d.getAmount() >= min) {
+                System.out.println(d);
+                found = true;
+            }
+        }
+        if (!found) System.out.println("No donations found.");
+    }
 
 }
 
