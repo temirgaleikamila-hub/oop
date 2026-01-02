@@ -60,11 +60,11 @@ public class Donor {
         return other != null && this.donorId==other.donorId;
     }
 
-    public abstract String getType();
     @Override
     public String toString() {
-        return "Donor{id=" + donorId + ", name='" + fullName + "', type='" + getType() + "'}";
+        return "Donor{id=" + donorId + ", name='" + fullName + "', type='" + donorType + "'}";
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
