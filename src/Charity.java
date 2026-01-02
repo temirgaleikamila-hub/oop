@@ -39,14 +39,14 @@ public class Charity {
     public void setEmail(String email) {
         this.email = email;
     }
-
+    @Override
     public String toString() {
-        return "Charity{id=" + charityId +
-                ", name='" + name +
-                ", category='" + category +
-                ", email='" + email + "}";
+        return "Charity{id=" + charityId + ", name='" + name + "'}";
     }
-
+    @Override
+    public int hashCode() {
+        return charityId;
+    }
     public boolean equals(Charity other) {
         return other != null && this.charityId == other.charityId;
     }
