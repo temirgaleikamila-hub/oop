@@ -8,15 +8,7 @@ public class Main {
             printMenu();
             String choice = sc.nextLine().trim();
             try {
-                if (choice.equals("1")) addDonor();
-                else if (choice.equals("2")) addCharity();
-                else if (choice.equals("3")) addDonation();
-                else if (choice.equals("4")) pool.printAll();
-                else if (choice.equals("5")) searchCharity();
-                else if (choice.equals("6")) filterDonations();
-                else if (choice.equals("7")) sortDonations();
-                else if (choice.equals("0")) {
-                    System.out.println("Bye!");
+
                     return;
                 } else {
                     System.out.println("Unknown choice.");
