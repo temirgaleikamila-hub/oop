@@ -60,11 +60,21 @@ public class Donor {
         return other != null && this.donorId==other.donorId;
     }
 
+    public abstract String getType();
+    @Override
     public String toString() {
-        return "Donor{id=" + donorId +
-                ", name='" + fullName +
-                ", email='" + email +
-                ", phone='" + phone +
-                ", type='" + donorType + "'}";
+        return "Donor{id=" + donorId + ", name='" + fullName + "', type='" + getType() + "'}";
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Donor)) return false;
+        Donor d = (Donor) o;
+        return donorId == d.donorId;
+    }
+
+    @Override
+    public int hashCode() {
+        return donorId;
     }
 }
