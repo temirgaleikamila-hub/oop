@@ -6,6 +6,7 @@ public class Donor {
     private String phone;
     private String donorType;
 
+
     //конструктор класса донор
     public Donor(int donorId, String fullName, String email, String phone, String donorType) {
         this.donorId = donorId;

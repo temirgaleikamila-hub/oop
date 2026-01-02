@@ -1,6 +1,7 @@
 import java.util.Scanner;
 import java.util.ArrayList;
 
+
 public class Main {
     private static final Scanner sc = new Scanner(System.in);
     private static final ArrayList<Donor> donors = new ArrayList<>();
@@ -154,6 +155,56 @@ public class Main {
         }
         if (!found) System.out.println("No donations found.");
     }
+    // сортировка пожертвований по сумме
+    private static void sortDonations() {
+        for (int i = 0; i < donations.size() - 1; i++) {
+            for (int j = i + 1; j < donations.size(); j++) {
+                if (donations.get(i).getAmount() > donations.get(j).getAmount()) {
+                    Donation tmp = donations.get(i);
+                    donations.set(i, donations.get(j));
+                    donations.set(j, tmp);
+                }
+            }
+        }
+        System.out.println("Sorted by amount.");
+    }
 
+    //  поиск донора по ID
+    private static Donor findDonorById(int id) {
+        for (Donor d : donors) {
+            if (d.getDonorId() == id) return d;
+        }
+        return null;
+    }
+
+    // поиск charity по ID
+    private static Charity findCharityById(int id) {
+        for (Charity c : charities) {
+            if (c.getCharityId() == id) return c;
+        }
+        return null;
+    }
+    //  ввод int с защитой от пустой строки
+    private static int readInt() {
+        while (true) {
+            String s = sc.nextLine().trim();
+            try {
+                return Integer.parseInt(s);
+            } catch (Exception e) {
+                System.out.print("Enter a valid int: ");
+            }
+        }
+    }
+
+    private static double readDouble() {
+        while (true) {
+            String s = sc.nextLine().trim();
+            try {
+                return Double.parseDouble(s);
+            } catch (Exception e) {
+                System.out.print("Enter a valid number: ");
+            }
+        }
+    }
 }
 

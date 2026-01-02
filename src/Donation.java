@@ -8,6 +8,7 @@ public class Donation {
     private String paymentMethod;
     private String status;
 
+
     public Donation(int donationId, Donor donor, Charity charity,
                     double amount, String donatedAt,
                     String paymentMethod, String status) {

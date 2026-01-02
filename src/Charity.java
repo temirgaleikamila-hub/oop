@@ -5,6 +5,7 @@ public class Charity {
     private String category;
     private String email;
 
+
     public Charity(int charityId, String name, String category, String email) {
         this.charityId = charityId;
         this.name = name;
@@ -35,10 +36,14 @@ public class Charity {
     public String getEmail() {
         return email;
     }
+    public int getCharityId() {
+        return charityId;
+    }
 
     public void setEmail(String email) {
         this.email = email;
     }
+
     @Override
     public String toString() {
         return "Charity{id=" + charityId + ", name='" + name + "'}";
