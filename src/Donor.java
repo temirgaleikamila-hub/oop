@@ -68,10 +68,10 @@ public class Donor {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Donor)) return false;
-        Donor d = (Donor) o;
-        return donorId == d.donorId;
+        if (this == o) return true; //current object
+        if (!(o instanceof Donor)) return false; //not inside donor class
+        Donor d = (Donor) o; //converts the object o to type Donor, access its fields
+        return donorId == d.donorId; //are the two donors equal by ID?
     }
 
     @Override

@@ -49,10 +49,11 @@ public class Charity {
         return "Charity{id=" + charityId + ", name='" + name + "'}";
     }
 
-    @Override
+    @Override //subclass redefines a method from its parent class to change the behavior
     public int hashCode() {
         return charityId;
-    }
+    } //hash of object is its id, represents object in hashed form
+    //used to quickly find, compare, or store objects
 
     public boolean equals(Charity other) {
         return other != null && this.charityId == other.charityId;
