@@ -8,3 +8,4 @@ public class IndividualDonor extends Donor {
         return "Individual";
     }
 }
+

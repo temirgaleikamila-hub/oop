@@ -59,3 +59,4 @@ public class Charity {
         return other != null && this.charityId == other.charityId;
     }
 }
+
