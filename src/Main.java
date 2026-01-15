@@ -1,6 +1,8 @@
-import java.util.Scanner;
-import java.util.ArrayList; // resizable array
+import org.postgresql.Db;
 
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.sql.Connection;
 public class Main {
 
     private static final Scanner sc = new Scanner(System.in);
@@ -9,6 +11,8 @@ public class Main {
     private static final ArrayList<Charity> charities = new ArrayList<>();
 
     public static void main(String[] args) {
+        Connection conn = Db.getConnection();
+        System.out.println("Database connected!");
         while (true) {
             printMenu();
             String choice = sc.nextLine().trim();
