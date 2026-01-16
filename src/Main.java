@@ -22,6 +22,10 @@ public class Main {
                 else if (choice.equals("2")) searchCharity();
                 else if (choice.equals("3")) filterDonations();
                 else if (choice.equals("4")) sortDonations();
+                else if (choice.equals("5")) createDonor();
+                else if (choice.equals("6")) readAllDonors();
+                else if (choice.equals("7")) updateDonor();
+                else if (choice.equals("8")) deleteDonor();
                 else if (choice.equals("0")) {
                     System.out.println("Bye!");
                     break;
