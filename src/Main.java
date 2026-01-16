@@ -2,7 +2,8 @@ import org.postgresql.Db;
 
 import java.util.Scanner;
 import java.util.ArrayList;
-import java.sql.Connection;
+import java.sql.*;
+
 public class Main {
 
     private static final Scanner sc = new Scanner(System.in);
@@ -45,6 +46,10 @@ public class Main {
         System.out.println("2) Search charity");
         System.out.println("3) Filter donations");
         System.out.println("4) Sort donations");
+        System.out.println("5) Create donor in DB");
+        System.out.println("6) Show all donors from DB");
+        System.out.println("7) Update donor in DB");
+        System.out.println("8) Delete donor from DB");
         System.out.println("0) Exit");
         System.out.print("Choose: ");
     }
@@ -98,5 +103,103 @@ public class Main {
     private static void sortDonations() {
         donations.sort((a, b) -> Double.compare(a.getAmount(), b.getAmount()));
         System.out.println("Sorted by amount.");
+    }
+
+    private static void createDonor() {
+        System.out.print("ID: ");
+        int donorId = Integer.parseInt(sc.nextLine());
+        System.out.print("Full name: ");
+        String fullName = sc.nextLine();
+        System.out.print("Email: ");
+        String email = sc.nextLine();
+        System.out.print("Phone: ");
+        String phone = sc.nextLine();
+        System.out.print("Donor type (Individual/Corporate): ");
+        String donorType = sc.nextLine();
+
+        String sql = "INSERT INTO \"Donor\" (donor_id, full_name, email, phone, donor_type) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, donorId);
+            ps.setString(2, fullName);
+            ps.setString(3, email);
+            ps.setString(4, phone);
+            ps.setString(5, donorType);
+            ps.executeUpdate();
+            System.out.println("Donor saved to DB.");
+
+        } catch (SQLException e) {
+            System.out.println("DB Error: " + e.getMessage());
+        }
+    }
+
+
+    private static void readAllDonors() {
+        String sql = "SELECT * FROM \"Donor\"";
+        try (Connection conn = Db.getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            while (rs.next()) {
+                System.out.println(
+                        "ID: " + rs.getInt("donor_id") +
+                                ", Name: " + rs.getString("full_name") +
+                                ", Email: " + rs.getString("email") +
+                                ", Phone: " + rs.getString("phone") +
+                                ", Type: " + rs.getString("donor_type")
+                );
+            }
+
+        } catch (SQLException e) {
+            System.out.println("DB Error: " + e.getMessage());
+        }
+    }
+
+    private static void updateDonor() {
+        System.out.print("Enter donor ID to update: ");
+        int id = Integer.parseInt(sc.nextLine());
+
+        System.out.print("New name: ");
+        String name = sc.nextLine();
+        System.out.print("New email: ");
+        String email = sc.nextLine();
+        System.out.print("New phone: ");
+        String phone = sc.nextLine();
+        System.out.print("New type: ");
+        String type = sc.nextLine();
+
+        String sql = "UPDATE \"Donor\" SET full_name=?, email=?, phone=?, donor_type=? WHERE donor_id=?";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ps.setString(2, email);
+            ps.setString(3, phone);
+            ps.setString(4, type);
+            ps.setInt(5, id);
+            ps.executeUpdate();
+            System.out.println("Donor updated in DB.");
+
+        } catch (SQLException e) {
+            System.out.println("DB Error: " + e.getMessage());
+        }
+    }
+
+    private static void deleteDonor() {
+        System.out.print("Enter donor ID to delete: ");
+        int id = Integer.parseInt(sc.nextLine());
+
+        String sql = "DELETE FROM \"Donor\" WHERE donor_id=?";
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ps.executeUpdate();
+            System.out.println("Donor deleted from DB.");
+
+        } catch (SQLException e) {
+            System.out.println("DB Error: " + e.getMessage());
+        }
     }
 }
