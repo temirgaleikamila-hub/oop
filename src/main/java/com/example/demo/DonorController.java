@@ -57,5 +57,9 @@ public class DonorController {
     public List<Donor> searchByName(@RequestParam String name) {
         return donorRepo.findByFullNameContainingIgnoreCase(name);
     }
+    @GetMapping("/count")
+    public long countDonors() {
+        return donorRepo.count();
+    }
 
 }

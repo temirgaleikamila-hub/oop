@@ -4,4 +4,6 @@ import java.util.List;
 
 public interface DonorRepository extends JpaRepository<Donor, Integer> {
     List<Donor> findByFullNameContainingIgnoreCase(String name);
+    long count();
+
 }
