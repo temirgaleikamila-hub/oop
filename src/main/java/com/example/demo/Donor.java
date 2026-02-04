@@ -1,10 +1,24 @@
 package com.example.demo;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "donors")
 public class Donor {
+
+    @Id
+    @Column(name = "donor_id")
     private int donorId;
+
+    @Column(name = "full_name")
     private String fullName;
+
+    @Column(name = "email")
     private String email;
+
+    @Column(name = "phone")
     private String phone;
+
+    @Column(name = "donor_type")
     private String donorType;
 
     public Donor() {}
