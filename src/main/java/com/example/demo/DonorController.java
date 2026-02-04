@@ -15,25 +15,21 @@ public class DonorController {
         this.donorRepo = donorRepo;
     }
 
-    // -------- CREATE --------
     @PostMapping
     public Donor createDonor(@RequestBody Donor donor) {
         return donorRepo.save(donor);
     }
 
-    // -------- READ (ALL) --------
     @GetMapping
     public List<Donor> getAllDonors() {
         return donorRepo.findAll();
     }
 
-    // -------- READ (ONE) --------
     @GetMapping("/{id}")
     public Donor getDonorById(@PathVariable int id) {
         return donorRepo.findById(id).orElse(null);
     }
 
-    // -------- UPDATE --------
     @PutMapping("/{id}")
     public Donor updateDonor(
             @PathVariable int id,
@@ -50,14 +46,17 @@ public class DonorController {
         return donorRepo.save(donor);
     }
 
-    // -------- DELETE --------
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDonor(@PathVariable int id) {
         if (!donorRepo.existsById(id)) {
-            return ResponseEntity.notFound().build(); // 404
+            return ResponseEntity.notFound().build();
         }
         donorRepo.deleteById(id);
-        return ResponseEntity.noContent().build(); // 204
+        return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/search")
+    public List<Donor> searchByName(@RequestParam String name) {
+        return donorRepo.findByFullNameContainingIgnoreCase(name);
     }
 
 }
