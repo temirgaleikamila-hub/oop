@@ -1,0 +1,932 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Donation System Admin</title>
+    <style>
+        body{font-family:Arial, sans-serif;max-width:1200px;margin:18px auto;padding:0 12px;}
+        h1{margin-bottom:6px}
+        .muted{color:#777;font-size:13px}
+        .grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px;}
+        .card{border:1px solid #e6e6e6;border-radius:14px;padding:14px;}
+        .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+        input,select,button{padding:8px;border:1px solid #ccc;border-radius:10px;}
+        button{cursor:pointer}
+        table{width:100%;border-collapse:collapse;margin-top:12px;}
+        th,td{border:1px solid #eee;padding:8px;text-align:left;vertical-align:top;}
+        th{background:#fafafa}
+        .section-title{display:flex;align-items:baseline;gap:10px}
+        .section-title h2{margin:0}
+        .badge{font-size:12px;color:#444;background:#f3f3f3;border:1px solid #e5e5e5;border-radius:999px;padding:3px 8px}
+        .msg{display:none;margin-top:10px;padding:10px;border-radius:12px;}
+        .msg.ok{background:#e9f9e9;border:1px solid #bfe7bf;}
+        .msg.err{background:#ffe9e9;border:1px solid #f2b4b4;}
+        .right{margin-left:auto}
+        .split{display:grid;grid-template-columns:1fr;gap:10px}
+        @media (min-width: 980px){ .split{grid-template-columns:1fr 1fr} }
+        .small{font-size:12px;color:#555}
+        code{background:#f6f6f6;padding:2px 6px;border-radius:8px}
+        /* validation UI */
+        .field-err{border-color:#f2b4b4 !important; outline:none; box-shadow:0 0 0 3px rgba(242,180,180,.25);}
+    </style>
+</head>
+<body>
+
+<h1>Donation System — Admin</h1>
+<div class="muted">
+    One page: <code>/api/donors</code> + <code>/api/charities</code> + <code>/api/donations</code> ·
+    Open: <code>http://localhost:8080/admin.html</code>
+</div>
+
+<div class="grid">
+
+    <!-- ========================= DONORS ========================= -->
+    <div class="card" id="donorsCard">
+        <div class="section-title">
+            <h2>Donors</h2>
+            <span class="badge">/api/donors</span>
+            <div class="right row">
+                <button onclick="donorsLoad()">Reload</button>
+            </div>
+        </div>
+
+        <div id="donorsMsg" class="msg"></div>
+
+        <div class="split">
+            <div>
+                <h3>Create donor</h3>
+                <div class="row">
+                    <input id="d_c_id" type="number" placeholder="donorId" />
+                    <input id="d_c_name" placeholder="fullName" />
+                    <input id="d_c_email" placeholder="email" />
+                    <input id="d_c_phone" placeholder="phone" />
+                    <select id="d_c_type">
+                        <option value="">donorType (optional)</option>
+                        <option value="Individual">Individual</option>
+                        <option value="Corporate">Corporate</option>
+                    </select>
+                    <button onclick="donorsCreate()">Create</button>
+                    <button onclick="donorsClearCreate()">Clear</button>
+                </div>
+                <div class="small muted">Validation: donorId&gt;0, fullName min 2 chars, phone only digits, email valid (optional).</div>
+            </div>
+
+            <div>
+                <h3>Update donor</h3>
+                <div class="small muted">Нажми <b>Edit</b> в таблице — поля заполнятся.</div>
+                <div class="row" style="margin-top:8px;">
+                    <input id="d_u_id" type="number" placeholder="donorId" disabled />
+                    <input id="d_u_name" placeholder="fullName" />
+                    <input id="d_u_email" placeholder="email" />
+                    <input id="d_u_phone" placeholder="phone" />
+                    <select id="d_u_type">
+                        <option value="">donorType (optional)</option>
+                        <option value="Individual">Individual</option>
+                        <option value="Corporate">Corporate</option>
+                    </select>
+                    <button onclick="donorsUpdate()">Update</button>
+                    <button onclick="donorsClearUpdate()">Clear</button>
+                </div>
+                <div class="small muted">Validation: fullName min 2 chars, phone only digits, email valid (optional).</div>
+            </div>
+        </div>
+
+        <h3 style="margin-top:14px;">List</h3>
+        <div class="row">
+            <input id="d_f_name" placeholder="search name contains" />
+            <select id="d_f_type">
+                <option value="">filter by type</option>
+                <option value="Individual">Individual</option>
+                <option value="Corporate">Corporate</option>
+            </select>
+            <button onclick="donorsLoad()">Load</button>
+            <button onclick="donorsResetFilter()">Reset</button>
+
+            <div class="right row">
+                <input id="d_get_id" type="number" placeholder="Get by ID" />
+                <button onclick="donorsGetById()">Get</button>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th><th>Full name</th><th>Email</th><th>Phone</th><th>Type</th><th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="donorsTbody">
+            <tr><td colspan="6" class="muted">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ========================= CHARITIES ========================= -->
+    <div class="card" id="charitiesCard">
+        <div class="section-title">
+            <h2>Charities</h2>
+            <span class="badge">/api/charities</span>
+            <div class="right row">
+                <button onclick="charitiesLoad()">Reload</button>
+            </div>
+        </div>
+
+        <div id="charitiesMsg" class="msg"></div>
+
+        <div class="split">
+            <div>
+                <h3>Create charity</h3>
+                <div class="row">
+                    <input id="c_c_id" type="number" placeholder="charityId" />
+                    <input id="c_c_name" placeholder="name" />
+                    <input id="c_c_cat" placeholder="category" />
+                    <input id="c_c_email" placeholder="email" />
+                    <button onclick="charitiesCreate()">Create</button>
+                    <button onclick="charitiesClearCreate()">Clear</button>
+                </div>
+                <div class="small muted">Validation: charityId&gt;0, name min 2 chars, email valid (optional).</div>
+            </div>
+
+            <div>
+                <h3>Update charity</h3>
+                <div class="small muted">Нажми <b>Edit</b> в таблице — поля заполнятся.</div>
+                <div class="row" style="margin-top:8px;">
+                    <input id="c_u_id" type="number" placeholder="charityId" disabled />
+                    <input id="c_u_name" placeholder="name" />
+                    <input id="c_u_cat" placeholder="category" />
+                    <input id="c_u_email" placeholder="email" />
+                    <button onclick="charitiesUpdate()">Update</button>
+                    <button onclick="charitiesClearUpdate()">Clear</button>
+                </div>
+                <div class="small muted">Validation: name min 2 chars, email valid (optional).</div>
+            </div>
+        </div>
+
+        <h3 style="margin-top:14px;">List</h3>
+        <div class="row">
+            <input id="c_f_name" placeholder="search name contains" />
+            <input id="c_f_cat" placeholder="filter category contains" />
+            <button onclick="charitiesLoad()">Load</button>
+            <button onclick="charitiesResetFilter()">Reset</button>
+
+            <div class="right row">
+                <input id="c_get_id" type="number" placeholder="Get by ID" />
+                <button onclick="charitiesGetById()">Get</button>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th><th>Name</th><th>Category</th><th>Email</th><th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="charitiesTbody">
+            <tr><td colspan="5" class="muted">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ========================= DONATIONS ========================= -->
+    <div class="card" id="donationsCard">
+        <div class="section-title">
+            <h2>Donations</h2>
+            <span class="badge">/api/donations</span>
+            <div class="right row">
+                <button onclick="refreshDonationSelects()">Refresh donor/charity lists</button>
+                <button onclick="donationsLoad()">Reload</button>
+            </div>
+        </div>
+
+        <div id="donationsMsg" class="msg"></div>
+
+        <div class="split">
+            <div>
+                <h3>Create donation</h3>
+                <div class="row">
+                    <input id="x_c_id" type="number" placeholder="donationId" />
+                    <select id="x_c_donor"></select>
+                    <select id="x_c_charity"></select>
+                    <input id="x_c_amount" type="number" step="0.01" placeholder="amount" />
+                    <input id="x_c_date" placeholder="donatedAt (e.g. 2026-02-12)" />
+                    <input id="x_c_pay" placeholder="paymentMethod" />
+                    <input id="x_c_status" placeholder="status" />
+                    <button onclick="donationsCreate()">Create</button>
+                    <button onclick="donationsClearCreate()">Clear</button>
+                </div>
+                <div class="small muted">Validation: donationId&gt;0, donor/charity chosen, amount&gt;0, donatedAt = YYYY-MM-DD.</div>
+            </div>
+
+            <div>
+                <h3>Update donation</h3>
+                <div class="small muted">Нажми <b>Edit</b> в таблице — поля заполнятся.</div>
+                <div class="row" style="margin-top:8px;">
+                    <input id="x_u_id" type="number" placeholder="donationId" disabled />
+                    <select id="x_u_donor"></select>
+                    <select id="x_u_charity"></select>
+                    <input id="x_u_amount" type="number" step="0.01" placeholder="amount" />
+                    <input id="x_u_date" placeholder="donatedAt" />
+                    <input id="x_u_pay" placeholder="paymentMethod" />
+                    <input id="x_u_status" placeholder="status" />
+                    <button onclick="donationsUpdate()">Update</button>
+                    <button onclick="donationsClearUpdate()">Clear</button>
+                </div>
+                <div class="small muted">Validation: donor/charity chosen, amount&gt;0, donatedAt = YYYY-MM-DD.</div>
+            </div>
+        </div>
+
+        <h3 style="margin-top:14px;">List</h3>
+        <div class="row">
+            <select id="x_f_donor"></select>
+            <select id="x_f_charity"></select>
+            <button onclick="donationsLoad()">Load</button>
+            <button onclick="donationsResetFilter()">Reset</button>
+
+            <div class="right row">
+                <input id="x_get_id" type="number" placeholder="Get by ID" />
+                <button onclick="donationsGetById()">Get</button>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th><th>Donor</th><th>Charity</th><th>Amount</th><th>DonatedAt</th><th>Payment</th><th>Status</th><th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="donationsTbody">
+            <tr><td colspan="8" class="muted">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    const API_DONORS = '/api/donors';
+    const API_CHARITIES = '/api/charities';
+    const API_DONATIONS = '/api/donations';
+
+    function esc(s){
+      return String(s ?? '')
+        .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+        .replaceAll('"','&quot;').replaceAll("'","&#39;");
+    }
+
+    function showMsg(boxId, text, ok=true){
+      const box = document.getElementById(boxId);
+      box.className = ok ? 'msg ok' : 'msg err';
+      box.textContent = text;
+      box.style.display = 'block';
+      setTimeout(()=> box.style.display='none', 5000);
+    }
+
+    async function readError(res){
+      try{
+        const data = await res.json();
+        return data?.error ?? JSON.stringify(data);
+      }catch(e){
+        return await res.text();
+      }
+    }
+
+    function fillSelect(selId, list, emptyLabel, valueFn, labelFn){
+      const sel = document.getElementById(selId);
+      sel.innerHTML = '';
+      const opt0 = document.createElement('option');
+      opt0.value = '';
+      opt0.textContent = emptyLabel;
+      sel.appendChild(opt0);
+      for(const x of list){
+        const opt = document.createElement('option');
+        opt.value = valueFn(x);
+        opt.textContent = labelFn(x);
+        sel.appendChild(opt);
+      }
+    }
+
+    /* ===================== VALIDATION HELPERS ===================== */
+    function clearFieldErr(el){ el.classList.remove('field-err'); }
+    function setFieldErr(el){ el.classList.add('field-err'); }
+
+    function digitsOnly(el){
+      // leave only digits
+      el.value = (el.value ?? '').replace(/[^\d]/g,'');
+    }
+
+    function isValidEmail(email){
+      if(!email) return true; // optional
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function isValidDateYYYYMMDD(s){
+      if(!s) return true; // allow empty if your backend allows; we still require it for donation create/update below
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+      const [y,m,d] = s.split('-').map(Number);
+      const dt = new Date(y, m-1, d);
+      return dt.getFullYear()===y && dt.getMonth()===(m-1) && dt.getDate()===d;
+    }
+
+    function requirePositiveNumber(el, fieldName, msgBoxId){
+      clearFieldErr(el);
+      const v = Number(el.value);
+      if(!v || v <= 0){
+        setFieldErr(el);
+        showMsg(msgBoxId, fieldName + ' must be > 0', false);
+        return null;
+      }
+      return v;
+    }
+
+    function requireMinLen(el, minLen, fieldName, msgBoxId){
+      clearFieldErr(el);
+      const v = (el.value || '').trim();
+      if(v.length < minLen){
+        setFieldErr(el);
+        showMsg(msgBoxId, fieldName + ' must be at least ' + minLen + ' chars', false);
+        return null;
+      }
+      return v;
+    }
+
+    function optionalEmail(el, msgBoxId){
+      clearFieldErr(el);
+      const v = (el.value || '').trim();
+      if(v && !isValidEmail(v)){
+        setFieldErr(el);
+        showMsg(msgBoxId, 'Invalid email', false);
+        return null;
+      }
+      return v;
+    }
+
+    function optionalPhoneDigits(el, msgBoxId){
+      clearFieldErr(el);
+      const v = (el.value || '').trim();
+      if(v && !/^\d+$/.test(v)){
+        setFieldErr(el);
+        showMsg(msgBoxId, 'Phone must contain only digits', false);
+        return null;
+      }
+      return v;
+    }
+
+    function requireDateYYYYMMDD(el, fieldName, msgBoxId){
+      clearFieldErr(el);
+      const v = (el.value || '').trim();
+      if(!v){
+        setFieldErr(el);
+        showMsg(msgBoxId, fieldName + ' is required', false);
+        return null;
+      }
+      if(!isValidDateYYYYMMDD(v)){
+        setFieldErr(el);
+        showMsg(msgBoxId, fieldName + ' must be YYYY-MM-DD', false);
+        return null;
+      }
+      return v;
+    }
+
+    // live validation UX (typing)
+    function bindLiveValidation(){
+      const phoneInputs = ['d_c_phone','d_u_phone'].map(id=>document.getElementById(id));
+      phoneInputs.forEach(inp=>{
+        inp.addEventListener('input', ()=>{ digitsOnly(inp); clearFieldErr(inp); });
+      });
+
+      const emailInputs = ['d_c_email','d_u_email','c_c_email','c_u_email'].map(id=>document.getElementById(id));
+      emailInputs.forEach(inp=>{
+        inp.addEventListener('input', ()=>{ clearFieldErr(inp); });
+        inp.addEventListener('blur', ()=>{ // on blur show red border if bad
+          if(inp.value.trim() && !isValidEmail(inp.value.trim())) setFieldErr(inp);
+          else clearFieldErr(inp);
+        });
+      });
+
+      const dateInputs = ['x_c_date','x_u_date'].map(id=>document.getElementById(id));
+      dateInputs.forEach(inp=>{
+        inp.addEventListener('input', ()=>{ clearFieldErr(inp); });
+        inp.addEventListener('blur', ()=>{
+          if(inp.value.trim() && !isValidDateYYYYMMDD(inp.value.trim())) setFieldErr(inp);
+          else clearFieldErr(inp);
+        });
+      });
+    }
+
+    // ---------------- DONORS ----------------
+    function donorsClearCreate(){
+      ['d_c_id','d_c_name','d_c_email','d_c_phone'].forEach(id=>{
+        const el = document.getElementById(id); el.value=''; clearFieldErr(el);
+      });
+      const t = document.getElementById('d_c_type'); t.value=''; clearFieldErr(t);
+    }
+    function donorsClearUpdate(){
+      ['d_u_id','d_u_name','d_u_email','d_u_phone'].forEach(id=>{
+        const el = document.getElementById(id); el.value=''; clearFieldErr(el);
+      });
+      const t = document.getElementById('d_u_type'); t.value=''; clearFieldErr(t);
+    }
+    function donorsResetFilter(){
+      document.getElementById('d_f_name').value='';
+      document.getElementById('d_f_type').value='';
+      donorsLoad();
+    }
+    function donorsBuildQuery(){
+      const name = document.getElementById('d_f_name').value.trim();
+      const type = document.getElementById('d_f_type').value.trim();
+      const p = new URLSearchParams();
+      if(type) p.set('type', type);
+      if(name) p.set('name', name);
+      const q = p.toString();
+      return q ? ('?' + q) : '';
+    }
+    function donorsRender(list){
+      const tbody = document.getElementById('donorsTbody');
+      tbody.innerHTML = '';
+      if(!list || list.length===0){
+        tbody.innerHTML = `<tr><td colspan="6" class="muted">No data</td></tr>`;
+        return;
+      }
+      for(const d of list){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${d.donorId ?? ''}</td>
+          <td>${esc(d.fullName)}</td>
+          <td>${esc(d.email)}</td>
+          <td>${esc(d.phone)}</td>
+          <td>${esc(d.donorType)}</td>
+          <td>
+            <button onclick='donorsEdit(${JSON.stringify(d).replace(/'/g,"&#39;")})'>Edit</button>
+            <button onclick='donorsDelete(${d.donorId})'>Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+    function donorsEdit(d){
+      const idEl = document.getElementById('d_u_id');
+      const nEl  = document.getElementById('d_u_name');
+      const eEl  = document.getElementById('d_u_email');
+      const pEl  = document.getElementById('d_u_phone');
+      const tEl  = document.getElementById('d_u_type');
+
+      idEl.value = d.donorId ?? '';
+      nEl.value = d.fullName ?? '';
+      eEl.value = d.email ?? '';
+      pEl.value = d.phone ?? '';
+      tEl.value = d.donorType ?? '';
+
+      [idEl,nEl,eEl,pEl,tEl].forEach(clearFieldErr);
+    }
+    async function donorsLoad(){
+      try{
+        const res = await fetch(API_DONORS + donorsBuildQuery());
+        if(!res.ok) throw new Error(await readError(res));
+        const list = await res.json();
+        donorsRender(list);
+        showMsg('donorsMsg', 'Loaded donors: ' + list.length, true);
+        await refreshDonationSelects();
+      }catch(e){ showMsg('donorsMsg', e.message, false); }
+    }
+    async function donorsGetById(){
+      const id = Number(document.getElementById('d_get_id').value);
+      if(!id) return showMsg('donorsMsg', 'Enter donor ID', false);
+      try{
+        const res = await fetch(`${API_DONORS}/${id}`);
+        if(!res.ok) throw new Error(await readError(res));
+        donorsRender([await res.json()]);
+        showMsg('donorsMsg', 'Found donor id=' + id, true);
+      }catch(e){ showMsg('donorsMsg', e.message, false); }
+    }
+    async function donorsCreate(){
+      const idEl = document.getElementById('d_c_id');
+      const nEl  = document.getElementById('d_c_name');
+      const eEl  = document.getElementById('d_c_email');
+      const pEl  = document.getElementById('d_c_phone');
+      const tEl  = document.getElementById('d_c_type');
+
+      const donorId = requirePositiveNumber(idEl, 'donorId', 'donorsMsg');
+      if(donorId===null) return;
+
+      const fullName = requireMinLen(nEl, 2, 'fullName', 'donorsMsg');
+      if(fullName===null) return;
+
+      const email = optionalEmail(eEl, 'donorsMsg');
+      if(email===null) return;
+
+      const phone = optionalPhoneDigits(pEl, 'donorsMsg');
+      if(phone===null) return;
+
+      const donorType = tEl.value;
+
+      try{
+        const res = await fetch(API_DONORS, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({donorId, fullName, email, phone, donorType})});
+        if(!res.ok) throw new Error(await readError(res));
+        await res.json();
+        showMsg('donorsMsg', 'Created donor id=' + donorId, true);
+        donorsClearCreate();
+        donorsLoad();
+      }catch(e){ showMsg('donorsMsg', e.message, false); }
+    }
+    async function donorsUpdate(){
+      const id = Number(document.getElementById('d_u_id').value);
+      if(!id) return showMsg('donorsMsg', 'Choose donor via Edit', false);
+
+      const nEl  = document.getElementById('d_u_name');
+      const eEl  = document.getElementById('d_u_email');
+      const pEl  = document.getElementById('d_u_phone');
+      const tEl  = document.getElementById('d_u_type');
+
+      const fullName = requireMinLen(nEl, 2, 'fullName', 'donorsMsg');
+      if(fullName===null) return;
+
+      const email = optionalEmail(eEl, 'donorsMsg');
+      if(email===null) return;
+
+      const phone = optionalPhoneDigits(pEl, 'donorsMsg');
+      if(phone===null) return;
+
+      const donorType = tEl.value;
+
+      try{
+        const res = await fetch(`${API_DONORS}/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({fullName, email, phone, donorType})});
+        if(!res.ok) throw new Error(await readError(res));
+        await res.json();
+        showMsg('donorsMsg', 'Updated donor id=' + id, true);
+        donorsClearUpdate();
+        donorsLoad();
+      }catch(e){ showMsg('donorsMsg', e.message, false); }
+    }
+    async function donorsDelete(id){
+      if(!confirm('Delete donor id=' + id + '?')) return;
+      try{
+        const res = await fetch(`${API_DONORS}/${id}`, {method:'DELETE'});
+        if(!res.ok) throw new Error(await readError(res));
+        await res.json();
+        showMsg('donorsMsg', 'Deleted donor id=' + id, true);
+        donorsLoad();
+      }catch(e){ showMsg('donorsMsg', e.message, false); }
+    }
+
+    // ---------------- CHARITIES ----------------
+    function charitiesClearCreate(){
+      ['c_c_id','c_c_name','c_c_cat','c_c_email'].forEach(id=>{
+        const el=document.getElementById(id); el.value=''; clearFieldErr(el);
+      });
+    }
+    function charitiesClearUpdate(){
+      ['c_u_id','c_u_name','c_u_cat','c_u_email'].forEach(id=>{
+        const el=document.getElementById(id); el.value=''; clearFieldErr(el);
+      });
+    }
+    function charitiesResetFilter(){
+      document.getElementById('c_f_name').value='';
+      document.getElementById('c_f_cat').value='';
+      charitiesLoad();
+    }
+    function charitiesBuildQuery(){
+      const name = document.getElementById('c_f_name').value.trim();
+      const cat = document.getElementById('c_f_cat').value.trim();
+      const p = new URLSearchParams();
+      if(name) p.set('name', name);
+      if(cat) p.set('category', cat);
+      const q = p.toString();
+      return q ? ('?' + q) : '';
+    }
+    function charitiesRender(list){
+      const tbody = document.getElementById('charitiesTbody');
+      tbody.innerHTML='';
+      if(!list || list.length===0){
+        tbody.innerHTML = `<tr><td colspan="5" class="muted">No data</td></tr>`;
+        return;
+      }
+      for(const c of list){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${c.charityId ?? ''}</td>
+          <td>${esc(c.name)}</td>
+          <td>${esc(c.category)}</td>
+          <td>${esc(c.email)}</td>
+          <td>
+            <button onclick='charitiesEdit(${JSON.stringify(c).replace(/'/g,"&#39;")})'>Edit</button>
+            <button onclick='charitiesDelete(${c.charityId})'>Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+    function charitiesEdit(c){
+      const idEl = document.getElementById('c_u_id');
+      const nEl  = document.getElementById('c_u_name');
+      const catEl= document.getElementById('c_u_cat');
+      const eEl  = document.getElementById('c_u_email');
+
+      idEl.value = c.charityId ?? '';
+      nEl.value = c.name ?? '';
+      catEl.value = c.category ?? '';
+      eEl.value = c.email ?? '';
+
+      [idEl,nEl,catEl,eEl].forEach(clearFieldErr);
+    }
+    async function charitiesLoad(){
+      try{
+        const res = await fetch(API_CHARITIES + charitiesBuildQuery());
+        if(!res.ok) throw new Error(await readError(res));
+        const list = await res.json();
+        charitiesRender(list);
+        showMsg('charitiesMsg', 'Loaded charities: ' + list.length, true);
+        await refreshDonationSelects();
+      }catch(e){ showMsg('charitiesMsg', e.message, false); }
+    }
+    async function charitiesGetById(){
+      const id = Number(document.getElementById('c_get_id').value);
+      if(!id) return showMsg('charitiesMsg', 'Enter charity ID', false);
+      try{
+        const res = await fetch(`${API_CHARITIES}/${id}`);
+        if(!res.ok) throw new Error(await readError(res));
+        charitiesRender([await res.json()]);
+        showMsg('charitiesMsg', 'Found charity id=' + id, true);
+      }catch(e){ showMsg('charitiesMsg', e.message, false); }
+    }
+    async function charitiesCreate(){
+      const idEl = document.getElementById('c_c_id');
+      const nEl  = document.getElementById('c_c_name');
+      const catEl= document.getElementById('c_c_cat');
+      const eEl  = document.getElementById('c_c_email');
+
+      const charityId = requirePositiveNumber(idEl, 'charityId', 'charitiesMsg');
+      if(charityId===null) return;
+
+      const name = requireMinLen(nEl, 2, 'name', 'charitiesMsg');
+      if(name===null) return;
+
+      const category = (catEl.value || '').trim();
+
+      const email = optionalEmail(eEl, 'charitiesMsg');
+      if(email===null) return;
+
+      try{
+        const res = await fetch(API_CHARITIES, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({charityId, name, category, email})});
+        if(!res.ok) throw new Error(await readError(res));
+        await res.json();
+        showMsg('charitiesMsg', 'Created charity id=' + charityId, true);
+        charitiesClearCreate();
+        charitiesLoad();
+      }catch(e){ showMsg('charitiesMsg', e.message, false); }
+    }
+    async function charitiesUpdate(){
+      const id = Number(document.getElementById('c_u_id').value);
+      if(!id) return showMsg('charitiesMsg', 'Choose charity via Edit', false);
+
+      const nEl  = document.getElementById('c_u_name');
+      const catEl= document.getElementById('c_u_cat');
+      const eEl  = document.getElementById('c_u_email');
+
+      const name = requireMinLen(nEl, 2, 'name', 'charitiesMsg');
+      if(name===null) return;
+
+      const category = (catEl.value || '').trim();
+
+      const email = optionalEmail(eEl, 'charitiesMsg');
+      if(email===null) return;
+
+      try{
+        const res = await fetch(`${API_CHARITIES}/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, category, email})});
+        if(!res.ok) throw new Error(await readError(res));
+        await res.json();
+        showMsg('charitiesMsg', 'Updated charity id=' + id, true);
+        charitiesClearUpdate();
+        charitiesLoad();
+      }catch(e){ showMsg('charitiesMsg', e.message, false); }
+    }
+    async function charitiesDelete(id){
+      if(!confirm('Delete charity id=' + id + '?')) return;
+      try{
+        const res = await fetch(`${API_CHARITIES}/${id}`, {method:'DELETE'});
+        if(!res.ok) throw new Error(await readError(res));
+        await res.json();
+        showMsg('charitiesMsg', 'Deleted charity id=' + id, true);
+        charitiesLoad();
+      }catch(e){ showMsg('charitiesMsg', e.message, false); }
+    }
+
+    // ---------------- DONATIONS ----------------
+    function donationsClearCreate(){
+      ['x_c_id','x_c_amount','x_c_date','x_c_pay','x_c_status'].forEach(id=>{
+        const el=document.getElementById(id); el.value=''; clearFieldErr(el);
+      });
+      document.getElementById('x_c_donor').value='';
+      document.getElementById('x_c_charity').value='';
+      clearFieldErr(document.getElementById('x_c_donor'));
+      clearFieldErr(document.getElementById('x_c_charity'));
+    }
+    function donationsClearUpdate(){
+      ['x_u_id','x_u_amount','x_u_date','x_u_pay','x_u_status'].forEach(id=>{
+        const el=document.getElementById(id); el.value=''; clearFieldErr(el);
+      });
+      document.getElementById('x_u_donor').value='';
+      document.getElementById('x_u_charity').value='';
+      clearFieldErr(document.getElementById('x_u_donor'));
+      clearFieldErr(document.getElementById('x_u_charity'));
+    }
+    function donationsResetFilter(){
+      document.getElementById('x_f_donor').value='';
+      document.getElementById('x_f_charity').value='';
+      donationsLoad();
+    }
+    function donationsBuildQuery(){
+      const donorId = document.getElementById('x_f_donor').value;
+      const charityId = document.getElementById('x_f_charity').value;
+      const p = new URLSearchParams();
+      if(donorId) p.set('donorId', donorId);
+      if(charityId) p.set('charityId', charityId);
+      const q = p.toString();
+      return q ? ('?' + q) : '';
+    }
+    function donationsRender(list){
+      const tbody = document.getElementById('donationsTbody');
+      tbody.innerHTML='';
+      if(!list || list.length===0){
+        tbody.innerHTML = `<tr><td colspan="8" class="muted">No data</td></tr>`;
+        return;
+      }
+      for(const d of list){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${d.donationId ?? ''}</td>
+          <td>${esc(d.donor?.fullName)} <span class="small muted">(id=${d.donor?.donorId})</span></td>
+          <td>${esc(d.charity?.name)} <span class="small muted">(id=${d.charity?.charityId})</span></td>
+          <td>${d.amount ?? ''}</td>
+          <td>${esc(d.donatedAt)}</td>
+          <td>${esc(d.paymentMethod)}</td>
+          <td>${esc(d.status)}</td>
+          <td>
+            <button onclick='donationsEdit(${JSON.stringify(d).replace(/'/g,"&#39;")})'>Edit</button>
+            <button onclick='donationsDelete(${d.donationId})'>Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+    function donationsEdit(d){
+      const idEl = document.getElementById('x_u_id');
+      const donorEl = document.getElementById('x_u_donor');
+      const charityEl = document.getElementById('x_u_charity');
+      const amountEl = document.getElementById('x_u_amount');
+      const dateEl = document.getElementById('x_u_date');
+      const payEl = document.getElementById('x_u_pay');
+      const statusEl = document.getElementById('x_u_status');
+
+      idEl.value = d.donationId ?? '';
+      donorEl.value = d.donor?.donorId ?? '';
+      charityEl.value = d.charity?.charityId ?? '';
+      amountEl.value = d.amount ?? '';
+      dateEl.value = d.donatedAt ?? '';
+      payEl.value = d.paymentMethod ?? '';
+      statusEl.value = d.status ?? '';
+
+      [idEl,donorEl,charityEl,amountEl,dateEl,payEl,statusEl].forEach(clearFieldErr);
+    }
+
+    async function refreshDonationSelects(){
+      let donors = [];
+      let charities = [];
+
+      try{ const r = await fetch(API_DONORS); donors = r.ok ? await r.json() : []; } catch(e){ donors=[]; }
+      try{ const r = await fetch(API_CHARITIES); charities = r.ok ? await r.json() : []; } catch(e){ charities=[]; }
+
+      fillSelect('x_c_donor', donors, 'Choose donor', d=>d.donorId, d=>`${d.fullName} (id=${d.donorId})`);
+      fillSelect('x_u_donor', donors, 'Choose donor', d=>d.donorId, d=>`${d.fullName} (id=${d.donorId})`);
+      fillSelect('x_f_donor', donors, 'Filter by donor', d=>d.donorId, d=>`${d.fullName} (id=${d.donorId})`);
+
+      fillSelect('x_c_charity', charities, 'Choose charity', c=>c.charityId, c=>`${c.name} (id=${c.charityId})`);
+      fillSelect('x_u_charity', charities, 'Choose charity', c=>c.charityId, c=>`${c.name} (id=${c.charityId})`);
+      fillSelect('x_f_charity', charities, 'Filter by charity', c=>c.charityId, c=>`${c.name} (id=${c.charityId})`);
+
+      // clear highlights after refresh
+      ['x_c_donor','x_c_charity','x_u_donor','x_u_charity','x_f_donor','x_f_charity'].forEach(id=>clearFieldErr(document.getElementById(id)));
+    }
+
+    async function donationsLoad(){
+      try{
+        const res = await fetch(API_DONATIONS + donationsBuildQuery());
+        if(!res.ok) throw new Error(await readError(res));
+        const list = await res.json();
+        donationsRender(list);
+        showMsg('donationsMsg', 'Loaded donations: ' + list.length, true);
+      }catch(e){ showMsg('donationsMsg', e.message, false); }
+    }
+
+    async function donationsGetById(){
+      const id = Number(document.getElementById('x_get_id').value);
+      if(!id) return showMsg('donationsMsg', 'Enter donation ID', false);
+      try{
+        const res = await fetch(`${API_DONATIONS}/${id}`);
+        if(!res.ok) throw new Error(await readError(res));
+        donationsRender([await res.json()]);
+        showMsg('donationsMsg', 'Found donation id=' + id, true);
+      }catch(e){ showMsg('donationsMsg', e.message, false); }
+    }
+
+    async function donationsCreate(){
+      const idEl = document.getElementById('x_c_id');
+      const donorEl = document.getElementById('x_c_donor');
+      const charityEl = document.getElementById('x_c_charity');
+      const amountEl = document.getElementById('x_c_amount');
+      const dateEl = document.getElementById('x_c_date');
+      const payEl = document.getElementById('x_c_pay');
+      const statusEl = document.getElementById('x_c_status');
+
+      const donationId = requirePositiveNumber(idEl, 'donationId', 'donationsMsg');
+      if(donationId===null) return;
+
+      clearFieldErr(donorEl);
+      const donorId = Number(donorEl.value);
+      if(!donorId){ setFieldErr(donorEl); return showMsg('donationsMsg', 'Choose donor', false); }
+
+      clearFieldErr(charityEl);
+      const charityId = Number(charityEl.value);
+      if(!charityId){ setFieldErr(charityEl); return showMsg('donationsMsg', 'Choose charity', false); }
+
+      const amount = Number(amountEl.value);
+      clearFieldErr(amountEl);
+      if(!amount || amount <= 0){ setFieldErr(amountEl); return showMsg('donationsMsg', 'amount must be > 0', false); }
+
+      const donatedAt = requireDateYYYYMMDD(dateEl, 'donatedAt', 'donationsMsg');
+      if(donatedAt===null) return;
+
+      const paymentMethod = (payEl.value || '').trim();
+      const status = (statusEl.value || '').trim();
+
+      try{
+        const res = await fetch(API_DONATIONS, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({donationId, donorId, charityId, amount, donatedAt, paymentMethod, status})});
+        if(!res.ok) throw new Error(await readError(res));
+        await res.json();
+        showMsg('donationsMsg', 'Created donation id=' + donationId, true);
+        donationsClearCreate();
+        donationsLoad();
+      }catch(e){ showMsg('donationsMsg', e.message, false); }
+    }
+
+    async function donationsUpdate(){
+      const id = Number(document.getElementById('x_u_id').value);
+      if(!id) return showMsg('donationsMsg', 'Choose donation via Edit', false);
+
+      const donorEl = document.getElementById('x_u_donor');
+      const charityEl = document.getElementById('x_u_charity');
+      const amountEl = document.getElementById('x_u_amount');
+      const dateEl = document.getElementById('x_u_date');
+      const payEl = document.getElementById('x_u_pay');
+      const statusEl = document.getElementById('x_u_status');
+
+      clearFieldErr(donorEl);
+      const donorId = Number(donorEl.value);
+      if(!donorId){ setFieldErr(donorEl); return showMsg('donationsMsg', 'Choose donor', false); }
+
+      clearFieldErr(charityEl);
+      const charityId = Number(charityEl.value);
+      if(!charityId){ setFieldErr(charityEl); return showMsg('donationsMsg', 'Choose charity', false); }
+
+      const amount = Number(amountEl.value);
+      clearFieldErr(amountEl);
+      if(!amount || amount <= 0){ setFieldErr(amountEl); return showMsg('donationsMsg', 'amount must be > 0', false); }
+
+      const donatedAt = requireDateYYYYMMDD(dateEl, 'donatedAt', 'donationsMsg');
+      if(donatedAt===null) return;
+
+      const paymentMethod = (payEl.value || '').trim();
+      const status = (statusEl.value || '').trim();
+
+      try{
+        const res = await fetch(`${API_DONATIONS}/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({donorId, charityId, amount, donatedAt, paymentMethod, status})});
+        if(!res.ok) throw new Error(await readError(res));
+        await res.json();
+        showMsg('donationsMsg', 'Updated donation id=' + id, true);
+        donationsClearUpdate();
+        donationsLoad();
+      }catch(e){ showMsg('donationsMsg', e.message, false); }
+    }
+
+    async function donationsDelete(id){
+      if(!confirm('Delete donation id=' + id + '?')) return;
+      try{
+        const res = await fetch(`${API_DONATIONS}/${id}`, {method:'DELETE'});
+        if(!res.ok) throw new Error(await readError(res));
+        await res.json();
+        showMsg('donationsMsg', 'Deleted donation id=' + id, true);
+        donationsLoad();
+      }catch(e){ showMsg('donationsMsg', e.message, false); }
+    }
+
+    // init
+    (async function init(){
+      bindLiveValidation();
+      await donorsLoad();
+      await charitiesLoad();
+      await refreshDonationSelects();
+      await donationsLoad();
+    })();
+</script>
+
+</body>
+</html>
